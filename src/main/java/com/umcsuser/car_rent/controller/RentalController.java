@@ -1,5 +1,6 @@
 package com.umcsuser.car_rent.controller;
 
+import com.umcsuser.car_rent.dto.RentalRequest;
 import com.umcsuser.car_rent.models.Rental;
 import com.umcsuser.car_rent.service.RentalService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,13 +25,13 @@ public class RentalController {
     }
 
     @PostMapping("/rent")
-    public Rental rentVehicle(@RequestParam String vehicleId, @RequestParam String userId) {
-        return rentalService.rent(vehicleId, userId);
+    public Rental rentVehicle(@RequestBody RentalRequest rentalDTO) {
+        return rentalService.rent(rentalDTO.getVehicleId(), rentalDTO.getUserId());
     }
 
     @PostMapping("/return")
-    public ResponseEntity<Void> returnVehicle(@RequestParam String vehicleId, @RequestParam String userId) {
-        boolean success = rentalService.returnRental(vehicleId, userId);
+    public ResponseEntity<Void> returnVehicle(@RequestBody RentalRequest rentalDTO) {
+        boolean success = rentalService.returnRental(rentalDTO.getVehicleId(), rentalDTO.getUserId());
         return success ? ResponseEntity.ok().build() : ResponseEntity.badRequest().build();
     }
 }

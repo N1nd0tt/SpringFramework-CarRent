@@ -1,4 +1,10 @@
 package com.umcsuser.car_rent.dto;
 
-public class RentalRequest {
+import lombok.Data;
+import lombok.Getter;
+
+@Data
+public class RentalRequest{
+    private String vehicleId;
+    private String userId;
 }
