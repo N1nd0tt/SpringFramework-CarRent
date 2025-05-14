@@ -6,5 +6,4 @@ import lombok.Getter;
 @Data
 public class RentalRequest{
     private String vehicleId;
-    private String userId;
 }
