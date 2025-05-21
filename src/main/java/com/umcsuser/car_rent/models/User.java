@@ -3,6 +3,8 @@ package com.umcsuser.car_rent.models;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.Set;
+
 @Entity
 @Table(name = "users")
 @Data
@@ -17,6 +19,12 @@ public class User {
     private String login;
     @Column(nullable = false)
     private String password;
-    @Column(nullable = false)
-    private String role;
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "user_roles",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id")
+    )
+    private Set<Role> roles;
+
 }

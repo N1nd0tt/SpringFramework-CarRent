@@ -35,12 +35,12 @@ public class VehicleController {
         return vehicle.map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
     }
 
-    @PostMapping
+    @PostMapping("/admin/add")
     public Vehicle addVehicle(@RequestBody Vehicle vehicle) {
         return vehicleService.save(vehicle);
     }
 
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("/admin/delete/{id}")
     public ResponseEntity<Void> deleteVehicle(@PathVariable String id) {
         vehicleService.deleteById(id);
         return ResponseEntity.noContent().build();
