@@ -8,12 +8,14 @@ import com.umcsuser.car_rent.repository.UserRepository;
 import com.umcsuser.car_rent.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
+@Service
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
@@ -42,9 +44,33 @@ public class UserServiceImpl implements UserService {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
     }
-    @Override
-    public List<User> findAll(){
+    public void softDeleteUser(String userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found."));
+        user.setActive(false); // Assuming `active` is a field in the `User` entity.
+        userRepository.save(user);
+    }
+
+    public List<User> findAll() {
         return userRepository.findAll();
+    }
+
+    public void removeRole(String userId, String roleName) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found."));
+        Role role = roleRepository.findByName(roleName)
+                .orElseThrow(() -> new IllegalArgumentException("Role not found."));
+        user.getRoles().remove(role);
+        userRepository.save(user);
+    }
+
+    public void addRole(String userId, String roleName) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found."));
+        Role role = roleRepository.findByName(roleName)
+                .orElseThrow(() -> new IllegalArgumentException("Role not found."));
+        user.getRoles().add(role);
+        userRepository.save(user);
     }
     @Override
     public Optional<User> findByLogin(String login) {

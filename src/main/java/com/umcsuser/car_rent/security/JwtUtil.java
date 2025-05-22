@@ -31,7 +31,7 @@ public class JwtUtil {
         Date now = new Date();
         Date expirationDate = new Date(now.getTime() + expirationMs);
         return Jwts.builder()
-                .header().contentType("JWT").and()
+                .header().type("JWT").and()
                 .claims().add(claims)
                 .and()
                 .subject(userDetails.getUsername())

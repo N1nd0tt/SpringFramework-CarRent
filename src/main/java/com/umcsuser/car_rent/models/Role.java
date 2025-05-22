@@ -1,5 +1,6 @@
 package com.umcsuser.car_rent.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -19,6 +20,6 @@ public class Role {
     @Column(nullable = false, unique = true)
     private String name;
     @ManyToMany(mappedBy = "roles")
-    @ToString.Exclude
+    @JsonIgnore
     private Set<User> users;
 }

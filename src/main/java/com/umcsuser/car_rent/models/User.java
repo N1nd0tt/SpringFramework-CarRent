@@ -19,6 +19,8 @@ public class User {
     private String login;
     @Column(nullable = false)
     private String password;
+    @Column(name = "is_active", nullable = false)
+    private boolean isActive;
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "user_roles",
