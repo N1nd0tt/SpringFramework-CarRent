@@ -25,4 +25,6 @@ public class Rental {
     @Column(name = "return_date")
     @Getter
     private String returnDate;
+    @OneToOne(mappedBy = "rental")
+    private Payment payment;
 }
