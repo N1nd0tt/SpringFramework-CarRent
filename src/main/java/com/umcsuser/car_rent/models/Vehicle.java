@@ -25,6 +25,9 @@ public class Vehicle {
     private String plate;
     @Column(name = "is_active", nullable = false)
     private boolean isActive;
+    @Column(name = "is_rented", nullable = false)
+    private boolean isRented;
+    private String location;
     @Type(JsonBinaryType.class)
     @Column(columnDefinition = "jsonb")
     @Builder.Default

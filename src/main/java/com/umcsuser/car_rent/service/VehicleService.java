@@ -21,5 +21,6 @@ public interface VehicleService {
 
     boolean isAvailable(String vehicleId);
 
+    void updateLocation(String vehicleId, String location);
     void deleteById(String id);
 }

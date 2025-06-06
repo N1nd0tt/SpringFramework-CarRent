@@ -31,7 +31,7 @@ public class RentalServiceImpl implements RentalService {
     @Override
     @Transactional(readOnly = true)
     public boolean isVehicleRented(String vehicleId) {
-        return rentalRepository.existsByVehicleIdAndReturnDateIsNull(vehicleId);
+        return vehicleRepository.findByIdAndIsRentedFalse(vehicleId).isPresent();
     }
 
     @Override
@@ -54,6 +54,7 @@ public class RentalServiceImpl implements RentalService {
                         .vehicle(vehicle.get())
                         .rentDate(java.time.LocalDate.now().toString())
                         .build();
+        vehicle.get().setRented(true);
         return rentalRepository.save(rental);
     }
 
@@ -62,11 +63,21 @@ public class RentalServiceImpl implements RentalService {
     public boolean returnRental(String vehicleId, String userId) {
         Optional<Rental> rental = rentalRepository.findByVehicleIdAndUserIdAndReturnDateIsNull(vehicleId, userId);
         if (rental.isPresent()) {
+            Vehicle vehicle = rental.get().getVehicle();
+            if (!isAllowedLocation(vehicle.getLocation())) {
+                throw new IllegalStateException("Vehicle is not in an allowed location for return.");
+            }
             rental.get().setReturnDate(java.time.LocalDate.now().toString());
+            vehicle.setRented(false);
             rentalRepository.save(rental.get());
             return true;
         }
         return false;
+    }
+
+    private boolean isAllowedLocation(String location) {
+        List<String> allowedLocations = List.of("Company HQ", "Service Center");
+        return allowedLocations.contains(location);
     }
 
     @Override

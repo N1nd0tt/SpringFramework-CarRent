@@ -4,13 +4,15 @@ import com.umcsuser.car_rent.models.Vehicle;
 import com.umcsuser.car_rent.service.VehicleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/vehicles")
+@RequestMapping("/api/vehicles")
 public class VehicleController {
     private final VehicleService vehicleService;
 
@@ -20,8 +22,12 @@ public class VehicleController {
     }
 
     @GetMapping
-    public List<Vehicle> getAllVehicles() {
-        return vehicleService.findAll();
+    public List<Vehicle> getVehicles(@AuthenticationPrincipal UserDetails userDetails) {
+        if (userDetails.getAuthorities().stream().anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"))) {
+            return vehicleService.findAll();
+        } else {
+            return vehicleService.findAvailableVehicles();
+        }
     }
 
     @GetMapping("/active")

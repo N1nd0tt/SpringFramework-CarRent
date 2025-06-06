@@ -25,6 +25,11 @@ public class MyUserDetailsService implements UserDetailsService {
                         .map(role -> new
                                 SimpleGrantedAuthority(role.getName()))
                         .toList();
+
+        if (!user.isActive()) {
+            throw new IllegalStateException("User is inactive");
+        }
+
         return new org.springframework.security.core.userdetails.User(
                 user.getLogin(),
                 user.getPassword(),

@@ -17,10 +17,12 @@ import com.umcsuser.car_rent.service.RentalService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import lombok.Value;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.beans.Transient;
+import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -46,7 +48,28 @@ public class PaymentServiceImpl implements PaymentService {
                 SessionCreateParams.LineItem.PriceData.ProductData.builder()
                         .setName("Rental " + rentalId)
                         .build();
-        var amount = 1000; //TODO: calculate amount
+        var rentDate = rental.getRentDate();
+        var returnDate = rental.getReturnDate();
+
+        if (rentDate == null || returnDate == null) {
+            throw new IllegalStateException("Rent date or return date is missing for rental ID: " + rentalId);
+        }
+
+        var rentDateTime = LocalDate.parse(rentDate).atStartOfDay();
+        var returnDateTime = LocalDate.parse(returnDate).atStartOfDay();
+        var rentalDurationMinutes = Duration.between(rentDateTime, returnDateTime).toMinutes();
+
+        if (rentalDurationMinutes <= 0) {
+            throw new IllegalStateException("Invalid rental duration for rental ID: " + rentalId);
+        }
+
+        var vehiclePrice = rental.getVehicle().getPrice();
+        if (vehiclePrice <= 0) {
+            throw new IllegalStateException("Invalid vehicle price for rental ID: " + rentalId);
+        }
+
+        var amount = rentalDurationMinutes * (vehiclePrice / (24 * 60));
+
         SessionCreateParams.LineItem.PriceData priceData =
                 SessionCreateParams.LineItem.PriceData.builder()
                         .setCurrency("pln")
@@ -95,7 +118,7 @@ public class PaymentServiceImpl implements PaymentService {
         } catch (SignatureVerificationException e) {
             throw new RuntimeException("Invalid signature", e);
         }
-        if("chekout.session.completed".equals(event.getType())){
+        if("checkout.session.completed".equals(event.getType())){
             StripeObject stripeObject =
                     event.getDataObjectDeserializer().getObject().orElseThrow();
             String sessionId = ((Session)stripeObject).getId();

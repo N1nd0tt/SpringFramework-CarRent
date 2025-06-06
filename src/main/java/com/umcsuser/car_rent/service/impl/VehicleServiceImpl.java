@@ -56,6 +56,15 @@ public class VehicleServiceImpl implements VehicleService {
     }
 
     @Override
+    @Transactional
+    public void updateLocation(String vehicleId, String location) {
+        vehicleRepository.findById(vehicleId).ifPresent(vehicle -> {
+            vehicle.setLocation(location);
+            vehicleRepository.save(vehicle);
+        });
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public List<Vehicle> findRentedVehicles() {
         Set<String> rentedVehicleIds = rentalRepository.findRentedVehicleIds();
