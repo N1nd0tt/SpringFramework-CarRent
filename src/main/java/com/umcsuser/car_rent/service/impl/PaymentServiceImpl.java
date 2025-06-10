@@ -48,6 +48,7 @@ public class PaymentServiceImpl implements PaymentService {
                 SessionCreateParams.LineItem.PriceData.ProductData.builder()
                         .setName("Rental " + rentalId)
                         .build();
+        //metoda obliczania kwoty do zapłaty
         var rentDate = rental.getRentDate();
         var returnDate = rental.getReturnDate();
 
@@ -57,18 +58,20 @@ public class PaymentServiceImpl implements PaymentService {
 
         var rentDateTime = LocalDate.parse(rentDate).atStartOfDay();
         var returnDateTime = LocalDate.parse(returnDate).atStartOfDay();
-        var rentalDurationMinutes = Duration.between(rentDateTime, returnDateTime).toMinutes();
+        var rentalDurationDays = Duration.between(rentDateTime, returnDateTime).toDays();
 
-        if (rentalDurationMinutes <= 0) {
+        if (rentalDurationDays < 0) {
             throw new IllegalStateException("Invalid rental duration for rental ID: " + rentalId);
         }
 
         var vehiclePrice = rental.getVehicle().getPrice();
-        if (vehiclePrice <= 0) {
+        if (vehiclePrice < 0) {
             throw new IllegalStateException("Invalid vehicle price for rental ID: " + rentalId);
         }
 
-        var amount = rentalDurationMinutes * (vehiclePrice / (24 * 60));
+        var amount = rentalDurationDays <= 1 ? vehiclePrice : vehiclePrice * rentalDurationDays;
+        amount *= 100;
+        //koniec metody
 
         SessionCreateParams.LineItem.PriceData priceData =
                 SessionCreateParams.LineItem.PriceData.builder()
