@@ -69,7 +69,7 @@ public class PaymentServiceImpl implements PaymentService {
             throw new IllegalStateException("Invalid vehicle price for rental ID: " + rentalId);
         }
 
-        var amount = rentalDurationDays <= 1 ? vehiclePrice : vehiclePrice * rentalDurationDays;
+        var amount = rentalDurationDays < 1 ? vehiclePrice : vehiclePrice * (rentalDurationDays+1);
         amount *= 100;
         //koniec metody
 
